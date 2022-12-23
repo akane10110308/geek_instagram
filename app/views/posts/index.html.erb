@@ -1,0 +1,60 @@
+<%= stylesheet_link_tag 'index', :media => "all" %>
+<div class="posts-container">
+
+  <h3>投稿一覧</h3>
+  <div class="ser">
+    <h3>投稿検索</h3>
+    <%= form_tag({controller:"posts",action:"index"}, method: :get) do %>
+      <%= text_field_tag :search %>
+      <%= submit_tag '検索'  %>
+    <% end %>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="row">
+    <% @posts.each do |t| %>
+      <div class="col-sm-4 col-12">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title"><%= t.body %></h5>
+            <p class="card-text"><%= t.created_at %></p>
+            <%= link_to t.user.name, user_path(t.user.id) %>
+
+            <figure class="icon-circle">
+              <%= image_tag t.user.icon_url, size: "250x200" if t.user.icon? %>
+            </figure>
+            <%= t.body %>
+            <%= image_tag t.image_url, size: "650x600" if t.image? %>
+            <div class="main-box">
+              <div class="left-container">
+                <% if user_signed_in? %>
+                  <% if current_user.already_liked?(t) %>
+                    <%= link_to post_like_path(id: t.id, post_id: t.id), method: :delete do %>
+                      <i class="fas fa-heart"></i><%= t.likes.count %>
+                    <% end %>
+                  <% else %>
+                    <%= link_to post_likes_path(id: t.id, post_id: t.id), method: :post do %>
+                      <i class="far fa-heart"></i><%= t.likes.count %>
+                    <% end %>
+                  <% end %>
+                <% else %>
+                  <i class="far fa-heart"></i><%= t.likes.count %>
+                <% end %>
+              </div>
+              <div class="right-container">
+                <%= link_to "詳細", post_path(t.id) %>
+                <% if user_signed_in? && current_user.id == t.user_id %>
+                  <%= link_to "編集", edit_post_path(t.id) %>
+                  <%= link_to "削除", post_path(t.id), method: :delete %>
+                <% end %> 
+              </div>
+            </div>
+          </div>
+          <p class="time"><%= t.created_at %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+
